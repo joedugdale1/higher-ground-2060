@@ -1,0 +1,987 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Higher Ground 2060</title>
+<meta name="description" content="A short survey on how society balances efficiency, community and safety today and in 2060.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+/* ===== Design tokens: paper, ink, clay, water, leaf ===== */
+:root{
+  --paper:#f3ede2;
+  --paper-2:#ebe3d4;
+  --paper-3:#fbf8f2;
+  --ink:#1d2726;
+  --ink-2:#4a5553;
+  --ink-3:#7c8582;
+  --rule:rgba(29,39,38,.14);
+  --eff:#a0720c;   /* Efficiency: ochre */
+  --com:#b4502f;   /* Community: terracotta */
+  --saf:#24658a;   /* Safety: water blue */
+  --leaf:#4f7f5c;  /* accent: corridor green */
+  --water:rgba(52,120,156,.55);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--paper);color:var(--ink);
+  font:16px/1.6 "DM Sans",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+.serif{font-family:Manrope,system-ui,sans-serif;font-weight:400}
+.caps{font:600 11px/1.3 "DM Sans",sans-serif;letter-spacing:.16em;text-transform:uppercase}
+
+/* ===== Top bar ===== */
+.top{
+  position:fixed;inset:0 0 auto 0;z-index:50;height:56px;
+  display:flex;justify-content:space-between;align-items:center;padding:0 22px;
+  background:rgba(243,237,226,.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--rule);
+}
+.brand{font-family:Manrope,system-ui,sans-serif;font-size:22px;letter-spacing:.01em}
+.brand em{color:var(--com)}
+.progress{display:flex;align-items:center;gap:10px;color:var(--ink-2)}
+.progress i{width:11px;height:11px;border-radius:50%;border:1.5px solid var(--ink);display:inline-block}
+.progress i.on{background:var(--leaf);border-color:var(--leaf)}
+.demo{
+  position:fixed;right:16px;top:66px;z-index:60;display:none;
+  background:var(--ink);color:var(--paper);font-size:12px;padding:7px 12px;border-radius:4px;max-width:260px;
+}
+
+/* ===== Scroll journey ===== */
+#journey{height:520vh;position:relative}
+.stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:var(--paper)}
+#scene{position:absolute;inset:0;width:100%;height:100%;display:block}
+.cap{
+  position:absolute;top:calc(56px + 6vh);left:max(24px,6vw);
+  width:min(560px,calc(100% - 120px));
+  opacity:0;pointer-events:none;will-change:opacity,transform;
+  text-shadow:0 0 14px rgba(243,237,226,.95),0 0 4px rgba(243,237,226,.9);
+}
+.cap .caps{color:var(--com);margin-bottom:12px}
+.cap h1{font-family:Manrope,system-ui,sans-serif;font-weight:400;font-size:clamp(44px,6.6vw,92px);line-height:.98;letter-spacing:-.01em}
+.cap h1 em{color:var(--saf)}
+.cap .lede{margin-top:18px;font-size:clamp(15px,1.6vw,18px);color:var(--ink-2);max-width:470px}
+.cap .lede b{font-weight:600}
+.cap .lede .e{color:var(--eff)} .cap .lede .c{color:var(--com)} .cap .lede .s{color:var(--saf)}
+.cap .hint{margin-top:22px;font-size:13px;color:var(--ink-3)}
+.cap .by{font-family:Manrope,system-ui,sans-serif;font-size:clamp(26px,3.2vw,40px);line-height:1.12}
+.cap .by b{font-weight:400;color:var(--com)}
+.cap .more{margin-top:10px;color:var(--ink-2);font-size:15px;max-width:460px}
+
+/* flood-gauge staff */
+.gauge{position:absolute;right:max(20px,3vw);top:calc(56px + 5vh);bottom:46vh;width:72px}
+.staff{
+  position:absolute;right:0;top:0;bottom:0;width:30px;border:1.5px solid var(--ink);
+  background:repeating-linear-gradient(to top,var(--ink) 0 5px,transparent 5px 10px) left/45% 100% no-repeat,var(--paper-3);
+  overflow:hidden;
+}
+.staff .fill{position:absolute;left:0;right:0;bottom:0;height:0;background:var(--water);border-top:2px solid var(--saf)}
+.gauge .tick{position:absolute;right:38px;transform:translateY(50%);font-size:11px;color:var(--ink-3);font-weight:500}
+.gauge .mark{position:absolute;right:-6px;width:42px;height:0;border-top:2px solid var(--com);transform:translateY(1px)}
+.gauge .mark::after{content:"";position:absolute;right:-1px;top:-6px;border:5px solid transparent;border-right-color:var(--com)}
+.dial{position:absolute;left:max(24px,6vw);bottom:calc(18px + env(safe-area-inset-bottom))}
+.dial .phase{color:var(--ink-2)}
+.dial .year{font-family:Manrope,system-ui,sans-serif;font-size:clamp(72px,13vw,170px);line-height:.85;letter-spacing:-.02em;color:var(--ink)}
+.skip{position:absolute;right:max(20px,3vw);bottom:calc(22px + env(safe-area-inset-bottom));font-size:13px;color:var(--ink-2)}
+@media (max-width:700px){
+  .gauge{width:46px;bottom:47vh}.staff{width:22px}.gauge .tick{right:27px;font-size:10px}.gauge .mark{width:32px}
+  .skip{display:none}.cap{width:calc(100% - 96px)}
+}
+
+.seam{height:120px;background:linear-gradient(#c9b596,var(--paper));margin-top:-1px}
+
+/* ===== Editorial chapters ===== */
+.chapter{max-width:1080px;margin:0 auto;padding:90px 24px 30px;display:grid;grid-template-columns:200px minmax(0,1fr);gap:40px}
+.chapter > aside{position:relative}
+.chapter > aside .sticky{position:sticky;top:90px}
+.num{font-family:Manrope,system-ui,sans-serif;font-size:56px;line-height:1;color:var(--com)}
+.chapter aside .caps{color:var(--ink-2);margin-top:6px}
+h2{font-family:Manrope,system-ui,sans-serif;font-weight:400;font-size:clamp(36px,4.6vw,58px);line-height:1.02;letter-spacing:-.01em;margin-bottom:16px}
+.lead{font-size:18px;color:var(--ink-2);max-width:620px}
+@media (max-width:860px){.panel{padding:18px 14px 20px}.chapter{grid-template-columns:minmax(0,1fr);gap:10px;padding-top:70px}.chapter > aside .sticky{position:static}.num{font-size:44px}}
+
+/* Scenario timeline */
+.timeline{list-style:none;margin-top:34px;border-left:1.5px solid var(--ink);padding-left:0}
+.timeline li{position:relative;padding:0 0 30px 34px}
+.timeline li::before{content:"";position:absolute;left:-7px;top:16px;width:12px;height:12px;border-radius:50%;background:var(--paper);border:1.5px solid var(--ink)}
+.timeline li:last-child::before{background:var(--com);border-color:var(--com)}
+.timeline .yr{font-family:Manrope,system-ui,sans-serif;font-size:46px;line-height:1}
+.timeline p{margin-top:6px;font-size:17px;max-width:600px}
+.glance{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;margin-top:10px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.glance div{padding:18px 12px 16px;border-right:1px solid var(--rule);text-align:center;font-size:13.5px;color:var(--ink-2)}
+.glance div:last-child{border-right:0}
+.glance svg{width:34px;height:34px;display:block;margin:0 auto 8px;stroke:var(--ink);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+@media (max-width:700px){.glance{grid-template-columns:repeat(2,1fr)}.glance div{border-bottom:1px solid var(--rule)}.glance div:nth-child(2n){border-right:0}}
+.bridge{margin-top:30px;font-family:Manrope,system-ui,sans-serif;font-style:italic;font-size:clamp(22px,2.4vw,28px);line-height:1.3;max-width:640px}
+
+/* Values glossary */
+.gloss{margin-top:30px;border-top:1.5px solid var(--ink)}
+.entry{display:grid;grid-template-columns:260px minmax(0,1fr);gap:24px;padding:22px 0;border-bottom:1px solid var(--rule)}
+.entry h3{font-family:Manrope,system-ui,sans-serif;font-weight:400;font-size:40px;line-height:1}
+.entry .pos{display:block;margin-top:6px;font-style:italic;color:var(--ink-3);font-size:14px}
+.entry p{font-size:17px}
+.entry .in,.entry .asks{margin-top:8px;color:var(--ink-2);font-size:15px}
+.entry .in b,.entry .asks b{color:var(--ink);font-weight:600}
+.entry.e h3{color:var(--eff)} .entry.c h3{color:var(--com)} .entry.s h3{color:var(--saf)}
+@media (max-width:700px){.entry{grid-template-columns:1fr;gap:6px}}
+.trade{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin-top:34px}
+.trade div{padding-top:14px;border-top:3px solid}
+.trade .t1{border-image:linear-gradient(90deg,var(--eff) 50%,var(--saf) 50%) 1}
+.trade .t2{border-image:linear-gradient(90deg,var(--eff) 50%,var(--com) 50%) 1}
+.trade .t3{border-image:linear-gradient(90deg,var(--com) 50%,var(--saf) 50%) 1}
+.trade h4{font-size:14px;font-weight:600;margin-bottom:6px}
+.trade p{font-size:15px;color:var(--ink-2)}
+@media (max-width:700px){.trade{grid-template-columns:1fr}}
+
+/* Questions */
+.diptych{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;margin-top:30px}
+@media (max-width:900px){.diptych{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--paper-3);border:1.5px solid var(--ink);padding:22px 22px 24px;position:relative}
+.panel.locked{border-color:var(--leaf)}
+.panel .caps{color:var(--ink-3)}
+.panel h3{font-family:Manrope,system-ui,sans-serif;font-weight:400;font-size:52px;line-height:1;margin:4px 0 8px}
+.panel .q{color:var(--ink-2);font-size:15px;min-height:6.4em}
+@media (max-width:900px){.panel .q{min-height:0}}
+.tern{margin:10px -6px 0}
+.tern svg{width:100%;height:auto;display:block;touch-action:none;cursor:crosshair;outline:none}
+.tern svg:focus-visible{outline:2px solid var(--leaf);outline-offset:2px}
+.panel.locked .tern svg{cursor:default}
+.stack{display:flex;height:12px;border:1.5px solid var(--ink);background:var(--paper-2);margin-top:6px}
+.stack span{display:block;height:100%;width:0;transition:width .15s ease}
+.stack .e{background:var(--eff)} .stack .c{background:var(--com)} .stack .s{background:var(--saf)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 10px;justify-content:space-between;margin-top:10px;font-size:14px}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{width:9px;height:9px;display:inline-block}
+.legend b{font-weight:600;min-width:34px;text-align:right}
+.btn{
+  margin-top:18px;width:100%;padding:13px 16px;border:1.5px solid var(--ink-3);background:transparent;
+  color:var(--ink-3);font:600 15px "DM Sans",sans-serif;letter-spacing:.02em;cursor:not-allowed;transition:all .15s ease;
+}
+.btn.ready{background:var(--ink);border-color:var(--ink);color:var(--paper);cursor:pointer}
+.btn.ready:hover{background:#2c3a38}
+.btn.done{border-color:var(--leaf);color:var(--leaf);cursor:default}
+.fine{margin-top:9px;font-size:12.5px;color:var(--ink-3);text-align:center;min-height:1.3em}
+.fine.err{color:#a8452a}
+
+/* Shift */
+#shift{display:none}
+.shiftbox{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:30px;align-items:center;margin-top:24px;border-top:1.5px solid var(--ink);padding-top:24px}
+.shiftbox p{font-family:Manrope,system-ui,sans-serif;font-size:clamp(22px,2.4vw,30px);line-height:1.25}
+.shiftbox p b{font-weight:400;font-style:italic}
+.shiftbox .key{margin-top:14px;display:flex;gap:18px;font-size:13px;color:var(--ink-2)}
+.shiftbox .key span{display:flex;align-items:center;gap:7px}
+@media (max-width:760px){.shiftbox{grid-template-columns:1fr}}
+
+
+/* ===== Display type: bold sans ===== */
+.brand{font-weight:800;font-size:18px;letter-spacing:-.01em}
+.cap h1{font-weight:800;font-size:clamp(44px,7vw,96px);line-height:.98;letter-spacing:-.035em}
+.cap h1 .e{color:var(--eff)} .cap h1 .c{color:var(--com)} .cap h1 .s{color:var(--saf)}
+.cap .by{font-weight:700;font-size:clamp(24px,3vw,38px);line-height:1.15;letter-spacing:-.02em}
+.cap .by b{font-weight:800}
+.dial .year{font-weight:800;font-size:clamp(60px,11vw,150px);letter-spacing:-.05em}
+.num{font-weight:800;font-size:48px;letter-spacing:-.03em}
+h2{font-weight:800;font-size:clamp(32px,4.2vw,52px);letter-spacing:-.03em;line-height:1.05}
+.timeline .yr{font-weight:800;font-size:38px;letter-spacing:-.03em}
+.bridge{font-style:normal;font-weight:600;font-size:clamp(19px,2vw,24px);letter-spacing:-.01em;line-height:1.35}
+.entry h3{font-weight:800;font-size:clamp(30px,3.4vw,42px);letter-spacing:-.035em}
+.shiftbox p{font-weight:600;font-size:clamp(20px,2.2vw,26px);letter-spacing:-.01em}
+.shiftbox p b{font-weight:800;font-style:normal}
+
+/* ===== How-to boxes ===== */
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:26px}
+.step{background:var(--paper-3);border:1.5px solid var(--ink);padding:18px 18px 20px}
+.step svg.mini{width:100%;max-width:150px;height:auto;display:block;margin:0 auto 12px}
+.step .n{font:800 13px Manrope,sans-serif;color:var(--com);letter-spacing:.06em}
+.step h4{font:800 18px/1.2 Manrope,sans-serif;letter-spacing:-.01em;margin:4px 0 6px}
+.step p{font-size:14.5px;color:var(--ink-2)}
+.step .eg{margin-top:10px;font:700 13px Manrope,sans-serif;display:flex;gap:10px;justify-content:center}
+.after{margin-top:16px;font-size:15px;color:var(--ink-2);max-width:680px}
+.after b{color:var(--ink)}
+@media (max-width:760px){.steps{grid-template-columns:minmax(0,1fr)}.step{display:grid;grid-template-columns:96px minmax(0,1fr);gap:0 14px;align-items:start}.step svg.mini{grid-row:span 4;margin:0}}
+
+/* ===== Question panels, stacked ===== */
+.panel{padding:0;margin-top:30px}
+.phead{display:flex;justify-content:space-between;align-items:center;padding:12px 22px;border-bottom:1.5px solid var(--ink)}
+.phead .when{font:800 14px Manrope,sans-serif;letter-spacing:.02em}
+.panel.now .phead{background:#dfe5e6}
+.panel.then .phead{background:linear-gradient(90deg,#f4dcc0,#d7e6d6)}
+.panel.then{background:#fcf6ec}
+.pbody{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:28px;align-items:center;padding:20px 24px 24px}
+.panel h3{font-weight:800;font-size:46px;letter-spacing:-.04em;margin:0 0 8px}
+.panel.then h3{color:var(--com)}
+.panel .q{min-height:0;margin-bottom:16px}
+.legend{flex-direction:column;gap:6px;margin-top:12px}
+.legend span{justify-content:flex-start}
+.legend b{margin-left:auto}
+@media (max-width:860px){.pbody{grid-template-columns:minmax(0,1fr);gap:8px;padding:16px 14px 20px}.phead{padding:10px 14px}}
+
+/* ===== Time jump between the two questions ===== */
+.jump{display:flex;align-items:center;gap:14px;margin:54px 0 0;scroll-margin-top:110px}
+.jend{display:flex;flex-direction:column;align-items:center;gap:4px;font:800 15px Manrope,sans-serif}
+.jend svg{width:46px;height:46px}
+.jtrack{flex:1;position:relative;height:2px;background:repeating-linear-gradient(90deg,var(--ink) 0 8px,transparent 8px 14px)}
+.jtrack::after{content:"";position:absolute;right:-2px;top:-6px;border:7px solid transparent;border-left:11px solid var(--ink);border-right:0}
+.jlabel{position:absolute;left:50%;top:-34px;transform:translateX(-50%);white-space:nowrap;background:var(--ink);color:var(--paper);font:700 13px Manrope,sans-serif;padding:5px 12px;border-radius:999px}
+.jnote{text-align:center;margin-top:16px;color:var(--ink-2);font-size:15px}
+
+footer{max-width:1080px;margin:60px auto 0;padding:24px 24px 60px;border-top:1px solid var(--rule);color:var(--ink-3);font-size:13px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">Higher Ground <em>2060</em></div>
+  <div class="progress caps" aria-label="Answers given"><span>Answers</span><i id="p1"></i><i id="p2"></i></div>
+</header>
+<div class="demo" id="demoBanner">Demo mode: answers are not saved until the endpoint is set.</div>
+
+<!-- ===== Scroll journey: a cross-section through time ===== -->
+<section id="journey" aria-label="Scroll from 2026 to 2060">
+  <div class="stage">
+    <canvas id="scene" aria-hidden="true"></canvas>
+
+    <div class="cap" data-a="-1" data-b="0.1">
+      <div class="caps">A survey on climate adaptation · 2026 to 2060</div>
+      <h1><span class="e">Efficiency,</span><br><span class="c">community</span><br>or <span class="s">safety?</span></h1>
+      <p class="lede">When the water rises, what comes first? Tell us how society balances these three values today, and how you think it will in 2060.</p>
+      <div class="hint">Scroll to move through time ↓</div>
+    </div>
+
+    <div class="cap" data-a="0.16" data-b="0.38">
+      <div class="by"><b>By 2030,</b> extreme weather events have become more frequent in countries across the world.</div>
+      <p class="more">The result is expensive repairs that are not sustainable for governments to maintain.</p>
+    </div>
+
+    <div class="cap" data-a="0.44" data-b="0.66">
+      <div class="by"><b>By 2040,</b> governments begin redesigning urban areas rather than repairing damaged infrastructure.</div>
+      <p class="more">Instead of patching up what the last storm broke, cities are rebuilt to cope with the next one, and to do less harm to the climate along the way.</p>
+    </div>
+
+    <div class="cap" data-a="0.78" data-b="2">
+      <div class="by"><b>By 2060,</b> cities are engineered for climate survival.</div>
+      <p class="more">Natural cooling systems, rooftop farms, and green pedestrian corridors in place of roads. Sea walls protect coastal areas, while vulnerable villages are relocated.</p>
+    </div>
+
+    <div class="gauge" aria-hidden="true">
+      <div class="staff"><div class="fill" id="gFill"></div></div>
+      <span class="tick" style="bottom:100%">2060</span>
+      <span class="tick" style="bottom:70.6%">2050</span>
+      <span class="tick" style="bottom:41.2%">2040</span>
+      <span class="tick" style="bottom:11.8%">2030</span>
+      <span class="mark" id="gMark" style="bottom:0"></span>
+    </div>
+    <div class="dial" aria-hidden="true">
+      <div class="phase caps" id="phase">Repair</div>
+      <div class="year" id="bigYear">2026</div>
+    </div>
+    <a class="skip" href="#answers">Skip to the questions ↓</a>
+  </div>
+</section>
+<div class="seam" aria-hidden="true"></div>
+
+<main>
+  <!-- ===== I. Scenario ===== -->
+  <section class="chapter" id="scenario">
+    <aside><div class="sticky"><div class="num">I.</div><div class="caps">The scenario</div></div></aside>
+    <div>
+      <h2>The World in 2060</h2>
+      <p class="lead">Our future, in three steps.</p>
+      <ol class="timeline">
+        <li><div class="yr">2030</div><p>Extreme weather events have become more frequent in countries across the world, resulting in expensive repairs that are not sustainable for governments to maintain.</p></li>
+        <li><div class="yr">2040</div><p>Governments begin responding to this crisis by redesigning urban areas to limit the effect of climate change on them and to become more eco-friendly, rather than having to repair damaged infrastructure.</p></li>
+        <li><div class="yr">2060</div><p>Cities are engineered for climate survival. There are natural cooling systems and rooftop farms, and roads have been replaced by green pedestrian corridors. Sea walls protect coastal areas, while vulnerable villages are relocated.</p></li>
+      </ol>
+
+      <div class="glance" aria-label="2060 at a glance">
+        <div><svg viewBox="0 0 34 34"><path d="M4 12c4-3 8 3 12 0s8 3 14 0M4 19c4-3 8 3 12 0s8 3 14 0M4 26c4-3 8 3 12 0s8 3 14 0"/></svg>Natural cooling</div>
+        <div><svg viewBox="0 0 34 34"><path d="M6 30V14h22v16M6 14l11-8 11 8"/><path d="M10 14v-3M14 14v-4M18 14v-3M22 14v-4" stroke="#4f7f5c"/></svg>Rooftop farms</div>
+        <div><svg viewBox="0 0 34 34"><path d="M12 31l3-14M22 31l-3-14"/><circle cx="8" cy="12" r="4" stroke="#4f7f5c"/><circle cx="26" cy="12" r="4" stroke="#4f7f5c"/><path d="M8 16v7M26 16v7"/></svg>Green corridors</div>
+        <div><svg viewBox="0 0 34 34"><path d="M20 30V8h6v22"/><path d="M3 16c3-2 5 2 8 0s5 2 8 0M3 22c3-2 5 2 8 0s5 2 8 0" stroke="#24658a"/></svg>Sea walls</div>
+        <div><svg viewBox="0 0 34 34"><path d="M3 28V20l5-4 5 4v8z"/><path d="M15 14c4-8 10-8 13-4" stroke-dasharray="2 3"/><path d="M25 7l3 3-4 1"/><path d="M21 28v-6l5-4 5 4v6z" stroke="#b4502f"/></svg>Relocation</div>
+      </div>
+
+      <p class="bridge">Sea walls can't protect everywhere. Deciding which places are walled, which villages are moved, and at what cost, means weighing three values against each other.</p>
+    </div>
+  </section>
+
+  <!-- ===== II. Values ===== -->
+  <section class="chapter" id="values">
+    <aside><div class="sticky"><div class="num">II.</div><div class="caps">The values</div></div></aside>
+    <div>
+      <h2>Three values, one limited budget</h2>
+      <p class="lead">Every adaptation decision draws on the same scarce money, land and time. Giving more priority to one value usually means giving less to another.</p>
+
+      <div class="gloss">
+        <div class="entry e"><div><h3>Efficiency</h3></div><div><p>Making the most of limited money, land and energy by directing them where they achieve the most.</p><p class="in"><b>In 2060:</b> Building the sea walls, cooling systems and relocations that give the biggest gain for the cost, and turning down the ones that don't.</p><p class="asks"><b>The question it raises:</b> When resources only go so far, who decides what counts as "the most good", and who is left with less?</p></div></div>
+        <div class="entry c"><div><h3>Community</h3></div><div><p>The relationships, shared places and sense of belonging that tie people to each other and to where they live.</p><p class="in"><b>In 2060:</b> Keeping neighbours together when villages are moved, and making new corridors, rooftop farms and public spaces somewhere people actually share a life.</p><p class="asks"><b>The question it raises:</b> What is lost when people are moved for their own protection, and can belonging be rebuilt somewhere new?</p></div></div>
+        <div class="entry s"><div><h3>Safety</h3></div><div><p>Protecting people from harm, and from the threat of it, as extreme weather becomes more frequent and severe.</p><p class="in"><b>In 2060:</b> Sea walls, cooling systems, and moving people away from places that can no longer be defended.</p><p class="asks"><b>The question it raises:</b> How much money, freedom and familiarity should people give up to be less at risk?</p></div></div>
+      </div>
+
+      <div class="trade">
+        <div class="t1"><h4>Efficiency and safety</h4><p>The cheapest plan that protects the most people overall can still leave some places more exposed than others.</p></div>
+        <div class="t2"><h4>Efficiency and community</h4><p>Moving a small village can cost less than defending it. Its neighbours, halls and history don't move with it.</p></div>
+        <div class="t3"><h4>Community and safety</h4><p>Staying together in a familiar place and preserving the legacy of your home town can mean putting yourself in harm's way.</p></div>
+      </div>
+      <p class="bridge">There is no right answer, only trade-offs. We want to know how you think society balances them.</p>
+    </div>
+  </section>
+
+  <!-- ===== III. Questions ===== -->
+  <section class="chapter" id="answers">
+    <aside><div class="sticky"><div class="num">III.</div><div class="caps">Your answers</div></div></aside>
+    <div>
+      <h2>Place one dot in each triangle</h2>
+      <p class="lead">Two questions, one dot each. Here is how the triangle works.</p>
+
+      <div class="steps">
+        <div class="step">
+          <svg class="mini" viewBox="0 0 100 92"><polygon points="50,10 8,82 92,82" fill="#f3ede2" stroke="#1d2726" stroke-width="1.5"/><rect x="47" y="7" width="6" height="6" fill="#a0720c"/><rect x="5" y="79" width="6" height="6" fill="#b4502f"/><rect x="89" y="79" width="6" height="6" fill="#24658a"/><circle cx="50" cy="26" r="9" fill="none" stroke="#1d2726" stroke-width="1"/><circle cx="50" cy="26" r="5" fill="#1d2726"/></svg>
+          <div class="n">01</div>
+          <h4>Closer to a corner = more priority</h4>
+          <p>Tap inside the triangle to place your dot. The nearer it sits to a value's corner, the more weight that value gets.</p>
+          <div class="eg"><span style="color:var(--eff)">E 78%</span><span style="color:var(--com)">C 11%</span><span style="color:var(--saf)">S 11%</span></div>
+        </div>
+        <div class="step">
+          <svg class="mini" viewBox="0 0 100 92"><polygon points="50,10 8,82 92,82" fill="#f3ede2" stroke="#1d2726" stroke-width="1.5"/><rect x="47" y="7" width="6" height="6" fill="#a0720c"/><rect x="5" y="79" width="6" height="6" fill="#b4502f"/><rect x="89" y="79" width="6" height="6" fill="#24658a"/><circle cx="50" cy="58" r="9" fill="none" stroke="#1d2726" stroke-width="1"/><circle cx="50" cy="58" r="5" fill="#1d2726"/></svg>
+          <div class="n">02</div>
+          <h4>The centre = equal priority</h4>
+          <p>A dot in the middle gives all three values the same weight, roughly a third each.</p>
+          <div class="eg"><span style="color:var(--eff)">E 33%</span><span style="color:var(--com)">C 33%</span><span style="color:var(--saf)">S 34%</span></div>
+        </div>
+        <div class="step">
+          <svg class="mini" viewBox="0 0 100 92"><polygon points="50,10 8,82 92,82" fill="#f3ede2" stroke="#1d2726" stroke-width="1.5"/><rect x="47" y="7" width="6" height="6" fill="#a0720c"/><rect x="5" y="79" width="6" height="6" fill="#b4502f"/><rect x="89" y="79" width="6" height="6" fill="#24658a"/><circle cx="50" cy="82" r="9" fill="none" stroke="#1d2726" stroke-width="1"/><circle cx="50" cy="82" r="5" fill="#1d2726"/></svg>
+          <div class="n">03</div>
+          <h4>An edge = one value barely counts</h4>
+          <p>A dot on an edge gives the value in the opposite corner little or no priority. Here, efficiency gets none.</p>
+          <div class="eg"><span style="color:var(--eff)">E 0%</span><span style="color:var(--com)">C 50%</span><span style="color:var(--saf)">S 50%</span></div>
+        </div>
+      </div>
+      <p class="after">The percentages update as you move. <b>Drag your dot</b> (or use the arrow keys) until they match what you think, then press <b>Submit</b>. Each triangle accepts one answer and locks once submitted.</p>
+
+      <div class="panel now" id="card-present">
+        <div class="phead"><span class="caps">Question 1 of 2</span><span class="when">Today</span></div>
+        <div class="pbody">
+          <div class="tern" data-plot="present"></div>
+          <div class="side">
+            <h3>2026</h3>
+            <p class="q">When society responds to extreme weather and decides where and how people live, how much priority does it <b>currently</b> give each value?</p>
+            <div class="stack"><span class="e" data-m="e"></span><span class="c" data-m="c"></span><span class="s" data-m="s"></span></div>
+            <div class="legend">
+              <span><i style="background:var(--eff)"></i>Efficiency <b data-k="e">·</b></span>
+              <span><i style="background:var(--com)"></i>Community <b data-k="c">·</b></span>
+              <span><i style="background:var(--saf)"></i>Safety <b data-k="s">·</b></span>
+            </div>
+            <button class="btn" type="button" disabled>Place your dot first</button>
+            <div class="fine">You can move the dot until you submit.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="jump" aria-hidden="true">
+        <div class="jend"><svg viewBox="0 0 46 46"><rect x="12" y="10" width="22" height="32" fill="#c4c7c4" stroke="#1d2726" stroke-width="1.5"/><path d="M17 16h3M26 16h3M17 23h3M26 23h3M17 30h3M26 30h3" stroke="#1d2726" stroke-width="2"/><path d="M4 42h38" stroke="#1d2726" stroke-width="1.5"/></svg><span>2026</span></div>
+        <div class="jtrack"><span class="jlabel">34 years later</span></div>
+        <div class="jend"><svg viewBox="0 0 46 46"><rect x="12" y="13" width="22" height="29" fill="#cc805c" stroke="#1d2726" stroke-width="1.5"/><rect x="12" y="9" width="22" height="4" fill="#6ea068" stroke="#1d2726" stroke-width="1.5"/><path d="M17 19h3M26 19h3M17 26h3M26 26h3M17 33h3M26 33h3" stroke="#1d2726" stroke-width="2"/><circle cx="6" cy="34" r="4" fill="#6ea068" stroke="#1d2726" stroke-width="1.2"/><circle cx="40" cy="34" r="4" fill="#6ea068" stroke="#1d2726" stroke-width="1.2"/><path d="M4 42h38" stroke="#1d2726" stroke-width="1.5"/></svg><span>2060</span></div>
+      </div>
+      <p class="jnote">Same three values. A world engineered for climate survival.</p>
+
+      <div class="panel then" id="card-future">
+        <div class="phead"><span class="caps">Question 2 of 2</span><span class="when">The future</span></div>
+        <div class="pbody">
+          <div class="tern" data-plot="future"></div>
+          <div class="side">
+            <h3>2060</h3>
+            <p class="q">In the <b>2060</b> world described above, how much priority do you think society <b>will</b> give each value?</p>
+            <div class="stack"><span class="e" data-m="e"></span><span class="c" data-m="c"></span><span class="s" data-m="s"></span></div>
+            <div class="legend">
+              <span><i style="background:var(--eff)"></i>Efficiency <b data-k="e">·</b></span>
+              <span><i style="background:var(--com)"></i>Community <b data-k="c">·</b></span>
+              <span><i style="background:var(--saf)"></i>Safety <b data-k="s">·</b></span>
+            </div>
+            <button class="btn" type="button" disabled>Place your dot first</button>
+            <div class="fine">You can move the dot until you submit.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Shift (after both answers) ===== -->
+  <section class="chapter" id="shift">
+    <aside><div class="sticky"><div class="num">✓</div><div class="caps">Thank you</div></div></aside>
+    <div>
+      <h2>Your shift, 2026 to 2060</h2>
+      <div class="shiftbox">
+        <div id="shiftPlot"></div>
+        <div>
+          <p id="shiftText"></p>
+          <div class="key"><span><i style="width:10px;height:10px;border-radius:50%;background:#7c8582;display:inline-block"></i>2026</span><span><i style="width:10px;height:10px;border-radius:50%;background:#1d2726;display:inline-block"></i>2060</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    This survey is part of a group project for MIS20070 Digital Society at UCD. It stores only your two dot positions, the time you submitted, a random anonymous ID and a hashed device signature (used solely to detect duplicate answers). No names, email addresses or IP addresses are collected.
+  </footer>
+</main>
+
+<script>
+/* =========================================================
+   CONFIG: paste your Google Apps Script web app URL here.
+   While it is left as the placeholder, the page runs in demo
+   mode and nothing is saved.
+   ========================================================= */
+const ENDPOINT = "https://script.google.com/macros/s/AKfycbw99FA4dn2UhUICjM_j7nz3xMfgZeNJeOAlxHHWb-DNv_gmf9JJnsoc781mLJOR5yEh0Q/exec";
+const DEMO = !/^https:\/\/script\.google\.com\//.test(ENDPOINT);
+const STORE_KEY = "higherground2060_v2";
+
+/* ---------- helpers ---------- */
+const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+const ss = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+const rgb = (c, al = 1) => `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${al})`;
+function rng(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const INK = [29, 39, 38];
+
+/* =========================================================
+   PART 1: the scroll-driven cross-section (2026 to 2060)
+   Sea on the left, a coastal city on a plateau, a village on
+   the floodplain, and higher ground on the right.
+   ========================================================= */
+const cv = document.getElementById("scene");
+const cx = cv.getContext("2d");
+const journey = document.getElementById("journey");
+const caps = [...document.querySelectorAll(".cap")];
+const gFill = document.getElementById("gFill"), gMark = document.getElementById("gMark");
+const bigYear = document.getElementById("bigYear"), phaseEl = document.getElementById("phase");
+
+// terrain profile as [x fraction, y fraction]
+const PROFILE = [[0, .95], [.08, .93], [.12, .84], [.15, .72], [.58, .72], [.62, .785], [.80, .785], [.85, .68], [.90, .6], [1, .59]];
+let W = 0, H = 0, S = 1, wallX = 0;
+let blds = [], houses = [], newHomes = [], trees = [], drops = [];
+let target = 0, cur = 0, flash = 0, running = true;
+
+function groundAt(x) {
+  const f = x / W;
+  for (let i = 1; i < PROFILE.length; i++) {
+    const [x1, y1] = PROFILE[i], [x0, y0] = PROFILE[i - 1];
+    if (f <= x1) return H * (y0 + (y1 - y0) * (f - x0) / (x1 - x0));
+  }
+  return H * PROFILE[PROFILE.length - 1][1];
+}
+
+function build() {
+  const r = rng(2060);
+  S = clamp(W / 1200, 0.55, 1.3);
+  wallX = W * 0.15;
+  blds = [];
+  let x = W * 0.17;
+  while (x < W * 0.565) {
+    const w = 26 * S + r() * 30 * S;
+    blds.push({ x, w: Math.min(w, W * 0.575 - x), h: H * (0.06 + r() * 0.15), seed: (r() * 1e6) | 0, tone: r() < 0.5, tower: r() < 0.35 });
+    x += w + 4 * S + r() * 6 * S;
+  }
+  houses = [];
+  let hx = W * 0.64;
+  for (let i = 0; i < 6 && hx < W * 0.78; i++) {
+    let w = (15 + r() * 8) * S, h = (11 + r() * 6) * S;
+    if (i === 2) { w *= 1.9; h *= 1.1; }
+    houses.push({ x: hx, w, h });
+    hx += w + (6 + r() * 6) * S;
+  }
+  newHomes = [];
+  hx = W * 0.875;
+  while (hx < W - 14 * S) {
+    const w = (16 + r() * 8) * S;
+    newHomes.push({ x: hx, w, h: (12 + r() * 7) * S });
+    hx += w + 5 * S;
+  }
+  trees = [];
+  for (let tx = W * 0.18; tx < W * 0.565; tx += 28 * S + r() * 22 * S) trees.push({ x: tx, r: (6 + r() * 4) * S });
+  drops = [];
+  const n = reduceMotion ? 140 : 420;
+  for (let i = 0; i < n; i++) drops.push({ x: r() * W * 1.3, y: r() * H, l: 10 + r() * 14, v: 8 + r() * 9 });
+}
+
+function resize() {
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  W = cv.clientWidth; H = cv.clientHeight;
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  build();
+}
+
+function readScroll() {
+  const rect = journey.getBoundingClientRect();
+  target = clamp(-rect.top / (journey.offsetHeight - window.innerHeight), 0, 1);
+}
+
+function terrainPath(dy = 0) {
+  cx.beginPath();
+  PROFILE.forEach(([fx, fy], i) => i ? cx.lineTo(fx * W, fy * H + dy) : cx.moveTo(fx * W, fy * H + dy));
+}
+
+function waterBand(x0, x1, top, t, storm) {
+  if (top >= H) return;
+  const amp = (1 + storm * 3) * S;
+  const yAt = x => top + Math.sin(x * 0.035 + t * 0.003) * amp;
+  cx.fillStyle = `rgba(52,120,156,${0.5 + storm * 0.1})`;
+  cx.beginPath(); cx.moveTo(x0, H);
+  for (let x = x0; x <= x1; x += 5) cx.lineTo(x, yAt(x));
+  cx.lineTo(x1, yAt(x1)); cx.lineTo(x1, H); cx.closePath(); cx.fill();
+  cx.strokeStyle = "rgba(36,101,138,.9)"; cx.lineWidth = 1.4;
+  cx.beginPath();
+  for (let x = x0; x <= x1; x += 5) x === x0 ? cx.moveTo(x, yAt(x)) : cx.lineTo(x, yAt(x));
+  cx.stroke();
+}
+
+function house(x, base, w, h, wall, roof, roofGreen) {
+  const y = base - h;
+  cx.fillStyle = wall; cx.fillRect(x, y, w, h);
+  cx.strokeStyle = rgb(INK, .85); cx.lineWidth = 1.1; cx.strokeRect(x, y, w, h);
+  cx.beginPath(); cx.moveTo(x - 2 * S, y); cx.lineTo(x + w / 2, y - h * 0.6); cx.lineTo(x + w + 2 * S, y); cx.closePath();
+  cx.fillStyle = roofGreen || roof; cx.fill(); cx.stroke();
+}
+
+function draw(t) {
+  cur += (target - cur) * 0.09;
+  const p = cur;
+  const storm = ss(0.04, 0.3, p) * (1 - ss(0.5, 0.7, p));
+  const flood = ss(0.12, 0.42, p) * (1 - ss(0.55, 0.68, p));
+  const wall = ss(0.48, 0.64, p);
+  const green = ss(0.6, 0.85, p);
+  const dawn = ss(0.66, 0.95, p);
+  const reloc = ss(0.58, 0.8, p);
+  const plateau = H * 0.72;
+
+  // Sky
+  const top = mix(mix([214, 222, 224], [126, 138, 144], storm), [204, 226, 220], dawn);
+  const bot = mix(mix([238, 233, 223], [172, 178, 176], storm), [247, 225, 192], dawn);
+  const g = cx.createLinearGradient(0, 0, 0, plateau);
+  g.addColorStop(0, rgb(top)); g.addColorStop(1, rgb(bot));
+  cx.fillStyle = g; cx.fillRect(0, 0, W, H);
+
+  // Sun over the 2060 city
+  if (dawn > 0.01) {
+    const sx = W * 0.4, sy = plateau - H * 0.34 + (1 - dawn) * H * 0.3, sr = H * 0.06;
+    cx.fillStyle = `rgba(236,178,92,${dawn})`;
+    cx.beginPath(); cx.arc(sx, sy, sr, 0, Math.PI * 2); cx.fill();
+    cx.strokeStyle = rgb(INK, 0.5 * dawn); cx.lineWidth = 1.2; cx.stroke();
+    cx.strokeStyle = `rgba(200,140,60,${0.5 * dawn})`;
+    for (let i = 0; i < 12; i++) {
+      const a = i * Math.PI / 6 + t * 0.0002;
+      cx.beginPath(); cx.moveTo(sx + Math.cos(a) * sr * 1.3, sy + Math.sin(a) * sr * 1.3); cx.lineTo(sx + Math.cos(a) * sr * 1.6, sy + Math.sin(a) * sr * 1.6); cx.stroke();
+    }
+  }
+
+  // Storm clouds
+  if (storm > 0.01) {
+    for (let i = 0; i < 8; i++) {
+      const x = ((i * W / 5.5 + t * 0.01 * (i % 3 + 1)) % (W * 1.5)) - W * 0.25;
+      const y = H * 0.1 + (i % 3) * H * 0.045;
+      cx.fillStyle = `rgba(92,102,108,${storm * (0.45 + (i % 3) * 0.12)})`;
+      cx.beginPath(); cx.ellipse(x, y, W * 0.17, H * 0.06, 0, 0, Math.PI * 2); cx.fill();
+    }
+  }
+
+  // City buildings (behind the water)
+  for (const b of blds) {
+    const y = plateau - b.h;
+    const base = b.tone ? mix([200, 202, 198], [204, 128, 92], green) : mix([184, 188, 186], [184, 106, 74], green);
+    cx.fillStyle = rgb(base); cx.fillRect(b.x, y, b.w, b.h);
+    // windows
+    const wr = rng(b.seed);
+    const cols = Math.max(2, Math.floor(b.w / (9 * S))), rows = Math.floor(b.h / (12 * S));
+    for (let rr = 1; rr < rows; rr++) for (let c = 0; c < cols; c++) {
+      const lit = wr() < 0.18 * (1 - storm);
+      cx.fillStyle = lit ? "rgba(230,170,70,.85)" : rgb(INK, 0.32);
+      cx.fillRect(b.x + (c + 0.35) * (b.w / cols), y + rr * 12 * S, 3 * S, 5 * S);
+    }
+    cx.strokeStyle = rgb(INK, .85); cx.lineWidth = 1.1; cx.strokeRect(b.x, y, b.w, b.h);
+    // rooftop farm
+    if (green > 0.01) {
+      const fh = 5 * S * green;
+      cx.fillStyle = "rgb(110,160,104)"; cx.fillRect(b.x, y - fh, b.w, fh);
+      cx.strokeRect(b.x, y - fh, b.w, fh);
+      cx.fillStyle = "rgb(79,127,92)";
+      for (let x = b.x + 3 * S; x < b.x + b.w - 2; x += 6 * S) { cx.beginPath(); cx.arc(x, y - fh, 2.2 * S * green, 0, Math.PI * 2); cx.fill(); }
+    }
+    // natural cooling: wind-catcher towers
+    if (b.tower && green > 0.3) {
+      const th = 14 * S * ss(0.3, 1, green), tw = 7 * S, tx = b.x + b.w * 0.6;
+      cx.fillStyle = "rgb(214,196,170)";
+      cx.beginPath(); cx.moveTo(tx, y - 5 * S * green); cx.lineTo(tx, y - th); cx.lineTo(tx + tw, y - th - 4 * S); cx.lineTo(tx + tw, y - 5 * S * green); cx.closePath();
+      cx.fill(); cx.stroke();
+    }
+  }
+
+  // Trees on the green corridor
+  if (green > 0.02) for (const tr of trees) {
+    const th = 8 * S * green;
+    cx.strokeStyle = rgb(INK, .85); cx.lineWidth = 1.1;
+    cx.beginPath(); cx.moveTo(tr.x, plateau); cx.lineTo(tr.x, plateau - th); cx.stroke();
+    cx.fillStyle = "rgb(104,152,104)";
+    cx.beginPath(); cx.arc(tr.x, plateau - th - tr.r * green * 0.8, tr.r * green, 0, Math.PI * 2); cx.fill(); cx.stroke();
+  }
+
+  // Village on the floodplain (fades as it is relocated)
+  const va = 1 - reloc;
+  if (va > 0.01) {
+    cx.globalAlpha = va;
+    for (const h of houses) house(h.x, H * 0.785, h.w, h.h, "rgb(245,241,233)", "rgb(80,86,90)");
+    cx.globalAlpha = 1;
+  }
+
+  // New settlement on the higher ground
+  if (reloc > 0.01) {
+    for (const h of newHomes) {
+      const base = groundAt(h.x + h.w / 2) + 2;
+      const k = ss(0, 1, reloc);
+      house(h.x, base, h.w, h.h * k, "rgb(204,128,92)", "", "rgb(110,160,104)");
+    }
+  }
+
+  // Water: sea, city and floodplain levels
+  const seaRise = Math.max(flood, wall * 0.75);
+  const seaY = H * 0.755 - H * 0.075 * seaRise;
+  const cityY = H * 0.755 - H * 0.075 * flood;
+  const plainY = H * 0.805 - H * 0.07 * ss(0.1, 0.42, p) * (1 - 0.5 * reloc);
+  waterBand(0, wallX, seaY, t, storm);
+  waterBand(wallX, W * 0.6, cityY, t + 300, storm);
+  waterBand(W * 0.6, W * 0.86, plainY, t + 600, storm);
+
+  // Ground cross-section with soil strata
+  terrainPath(); cx.lineTo(W, H); cx.lineTo(0, H); cx.closePath();
+  const sg = cx.createLinearGradient(0, H * 0.58, 0, H);
+  sg.addColorStop(0, "rgb(214,196,166)"); sg.addColorStop(1, "rgb(196,174,142)");
+  cx.fillStyle = sg; cx.fill();
+  cx.save(); cx.clip();
+  cx.setLineDash([4, 6]); cx.strokeStyle = rgb(INK, 0.22); cx.lineWidth = 1;
+  [16, 34, 58, 90].forEach(d => { terrainPath(d * S); cx.stroke(); });
+  cx.setLineDash([]);
+  cx.restore();
+  // surface: road on the plateau becomes a green corridor
+  cx.lineWidth = 5 * S; cx.lineCap = "butt";
+  cx.strokeStyle = rgb(mix([128, 130, 128], [110, 160, 104], green));
+  cx.beginPath(); cx.moveTo(W * 0.15, plateau + 2.5 * S); cx.lineTo(W * 0.58, plateau + 2.5 * S); cx.stroke();
+  if (green < 0.98) {
+    cx.setLineDash([8 * S, 8 * S]); cx.lineWidth = 1; cx.strokeStyle = `rgba(250,246,236,${1 - green})`;
+    cx.beginPath(); cx.moveTo(W * 0.15, plateau + 2.5 * S); cx.lineTo(W * 0.58, plateau + 2.5 * S); cx.stroke();
+    cx.setLineDash([]);
+  }
+  // reeds where the village was
+  if (reloc > 0.05) {
+    cx.strokeStyle = `rgba(79,127,92,${reloc})`; cx.lineWidth = 1;
+    for (let x = W * 0.64; x < W * 0.8; x += 5 * S) {
+      const hh = (5 + 6 * Math.abs(Math.sin(x * 0.7))) * S * reloc;
+      cx.beginPath(); cx.moveTo(x, H * 0.785); cx.lineTo(x + Math.sin(t * 0.002 + x) * 1.5, H * 0.785 - hh); cx.stroke();
+    }
+  }
+  terrainPath(); cx.strokeStyle = rgb(INK); cx.lineWidth = 1.6; cx.stroke();
+
+  // Sea wall
+  if (wall > 0.01) {
+    const ww = W * 0.012, top2 = plateau - wall * H * 0.07, base = groundAt(wallX);
+    cx.fillStyle = "rgb(176,180,176)"; cx.fillRect(wallX - ww, top2, ww, base - top2 + 4);
+    cx.strokeStyle = rgb(INK); cx.lineWidth = 1.3; cx.strokeRect(wallX - ww, top2, ww, base - top2 + 4);
+    cx.setLineDash([2, 4]); cx.beginPath();
+    for (let y = top2 + 8; y < base; y += 8) { cx.moveTo(wallX - ww, y); cx.lineTo(wallX, y); }
+    cx.strokeStyle = rgb(INK, .35); cx.stroke(); cx.setLineDash([]);
+  }
+
+  // Relocation path to higher ground
+  const arcA = Math.sin(Math.PI * clamp(reloc, 0, 1));
+  if (arcA > 0.02) {
+    const x0 = W * 0.71, y0 = H * 0.75, x1 = W * 0.9, y1 = H * 0.55;
+    cx.strokeStyle = `rgba(180,80,47,${arcA})`; cx.lineWidth = 1.8;
+    cx.setLineDash([5, 6]); cx.lineDashOffset = -t * 0.03;
+    cx.beginPath(); cx.moveTo(x0, y0); cx.quadraticCurveTo(W * 0.78, H * 0.5, x1, y1); cx.stroke();
+    cx.setLineDash([]);
+    cx.fillStyle = `rgba(180,80,47,${arcA})`;
+    cx.beginPath(); cx.moveTo(x1, y1); cx.lineTo(x1 - 9, y1 - 2); cx.lineTo(x1 - 4, y1 + 7); cx.closePath(); cx.fill();
+  }
+
+  // Rain (ink hatching)
+  const rainAmt = (0.1 + 0.9 * storm) * (1 - ss(0.6, 0.72, p));
+  const n = Math.floor(drops.length * rainAmt);
+  if (n > 0) {
+    cx.strokeStyle = `rgba(40,58,66,${0.25 + storm * 0.25})`; cx.lineWidth = 1;
+    cx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const d = drops[i];
+      d.y += d.v * (0.7 + storm); d.x -= d.v * 0.35 * (0.5 + storm);
+      if (d.y > H) { d.y = -20; d.x = Math.random() * W * 1.3; }
+      if (d.x < -30) d.x += W * 1.3;
+      cx.moveTo(d.x, d.y); cx.lineTo(d.x - d.l * 0.35, d.y + d.l);
+    }
+    cx.stroke();
+  }
+
+  // Lightning flash
+  if (!reduceMotion && storm > 0.6 && Math.random() < 0.01 * storm) flash = 1;
+  if (flash > 0.02) { cx.fillStyle = `rgba(255,255,250,${flash * 0.35})`; cx.fillRect(0, 0, W, H); flash *= 0.85; }
+
+  // Captions
+  for (const c of caps) {
+    const a = +c.dataset.a, b = +c.dataset.b;
+    const o = ss(a - 0.04, a, p) * (1 - ss(b, b + 0.04, p));
+    c.style.opacity = o.toFixed(3);
+    c.style.transform = `translateY(${(1 - o) * 14}px)`;
+  }
+
+  // Gauge and year
+  gFill.style.height = (p * 100).toFixed(2) + "%";
+  gMark.style.bottom = (p * 100).toFixed(2) + "%";
+  bigYear.textContent = Math.round(2026 + 34 * p);
+  phaseEl.textContent = p < 0.42 ? "Repair" : p < 0.74 ? "Redesign" : "Engineered for survival";
+}
+
+function loop(t) { if (running) draw(t); requestAnimationFrame(loop); }
+window.addEventListener("resize", () => { resize(); readScroll(); });
+window.addEventListener("scroll", readScroll, { passive: true });
+new IntersectionObserver(es => { running = es[0].isIntersecting; }).observe(journey);
+resize(); readScroll(); cur = target;
+requestAnimationFrame(loop);
+
+/* =========================================================
+   PART 2: ternary plots
+   Vertex A (top) = Efficiency, B (bottom-left) = Community,
+   C (bottom-right) = Safety. A point's share of each value is
+   its barycentric coordinate, so e + c + s = 1 always.
+   ========================================================= */
+const A = { x: 200, y: 40 }, B = { x: 30, y: 334.45 }, C = { x: 370, y: 334.45 };
+const COL = { e: "#a0720c", c: "#b4502f", s: "#24658a" };
+
+function toXY(v) { return { x: v.e * A.x + v.c * B.x + v.s * C.x, y: v.e * A.y + v.c * B.y + v.s * C.y }; }
+function toBary(x, y) {
+  const det = (B.y - C.y) * (A.x - C.x) + (C.x - B.x) * (A.y - C.y);
+  let e = ((B.y - C.y) * (x - C.x) + (C.x - B.x) * (y - C.y)) / det;
+  let c = ((C.y - A.y) * (x - C.x) + (A.x - C.x) * (y - C.y)) / det;
+  let s = 1 - e - c;
+  e = Math.max(0, e); c = Math.max(0, c); s = Math.max(0, s);
+  const tot = e + c + s;
+  return { e: e / tot, c: c / tot, s: s / tot };
+}
+// Whole-number percentages that always add to 100 (largest remainder)
+function pct(v) {
+  const raw = [v.e, v.c, v.s].map(x => x * 100), fl = raw.map(Math.floor);
+  const rem = 100 - fl.reduce((a, b) => a + b, 0);
+  raw.map((x, i) => [x - fl[i], i]).sort((a, b) => b[0] - a[0]).slice(0, rem).forEach(([, i]) => fl[i]++);
+  return { e: fl[0], c: fl[1], s: fl[2] };
+}
+
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs, parent) {
+  const n = document.createElementNS(NS, tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(n);
+  return n;
+}
+
+function triangleBase(svg, fill, withEdges) {
+  el("polygon", { points: `${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y}`, fill: fill || "#f3ede2", stroke: "#1d2726", "stroke-width": 1.5 }, svg);
+  const grid = el("g", { stroke: "rgba(29,39,38,.1)", "stroke-width": 1 }, svg);
+  for (let k = 1; k < 10; k++) {
+    const f = k / 10;
+    const lines = [
+      [{ e: f, c: 1 - f, s: 0 }, { e: f, c: 0, s: 1 - f }],
+      [{ e: 1 - f, c: f, s: 0 }, { e: 0, c: f, s: 1 - f }],
+      [{ e: 1 - f, c: 0, s: f }, { e: 0, c: 1 - f, s: f }],
+    ];
+    for (const [a, b] of lines) { const p = toXY(a), q = toXY(b); el("line", { x1: p.x, y1: p.y, x2: q.x, y2: q.y }, grid); }
+  }
+  const lbl = (txt, x, y, col) => { const t = el("text", { x, y, fill: col, "font-family": "Manrope,system-ui,sans-serif", "font-size": 17, "font-weight": 800, "text-anchor": "middle" }, svg); t.textContent = txt; };
+  lbl("Efficiency", A.x, A.y - 12, COL.e);
+  lbl("Community", B.x + 14, B.y + 28, COL.c);
+  lbl("Safety", C.x - 6, C.y + 28, COL.s);
+  [[A, COL.e], [B, COL.c], [C, COL.s]].forEach(([P, col]) => el("rect", { x: P.x - 4, y: P.y - 4, width: 8, height: 8, fill: col }, svg));
+  if (withEdges) {
+    // what each edge means: the value in the opposite corner gets little or no priority
+    const ed = (txt, x, y, rot) => { const t = el("text", { x, y, transform: `rotate(${rot} ${x} ${y})`, fill: "#4a5553", "font-family": "'DM Sans',sans-serif", "font-size": 13.5, "font-style": "italic", "text-anchor": "middle" }, svg); t.textContent = txt; };
+    ed("Cheap and close-knit, but exposed to danger.", 100, 180, -60);
+    ed("Safe for less, but communities scattered.", 300, 180, 60);
+    ed("Safe and together, whatever the cost.", 200, 388, 0);
+  }
+}
+
+/* ---------- local state ---------- */
+function loadState() { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch (_) { return {}; } }
+function saveState(s) { try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (_) {} }
+const state = loadState();
+if (!state.rid) {
+  state.rid = (crypto.randomUUID ? crypto.randomUUID() : "r" + Date.now().toString(36) + Math.random().toString(36).slice(2, 12));
+  saveState(state);
+}
+
+/* ---------- device signature (hashed, used only for duplicate detection) ---------- */
+const deviceHashPromise = (async () => {
+  const parts = [
+    navigator.userAgent, navigator.language, (navigator.languages || []).join(","),
+    screen.width + "x" + screen.height, screen.colorDepth,
+    Intl.DateTimeFormat().resolvedOptions().timeZone,
+    navigator.hardwareConcurrency || "", navigator.deviceMemory || "",
+    navigator.platform || "", navigator.maxTouchPoints || 0,
+  ];
+  try {
+    const c = document.createElement("canvas"), g2 = c.getContext("2d");
+    g2.textBaseline = "top"; g2.font = "14px Arial"; g2.fillStyle = "#f60"; g2.fillRect(0, 0, 60, 20);
+    g2.fillStyle = "#069"; g2.fillText("HigherGround2060", 2, 2); parts.push(c.toDataURL());
+  } catch (_) {}
+  const str = parts.join("|");
+  try {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+  } catch (_) { // fallback for non-secure contexts
+    let h = 0x811c9dc5;
+    for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193); }
+    return (h >>> 0).toString(16).padStart(8, "0");
+  }
+})();
+
+/* ---------- submission ---------- */
+async function submit(plot, v) {
+  const e = Math.round(v.e * 1e4) / 1e4, c = Math.round(v.c * 1e4) / 1e4;
+  const s = Math.max(0, Math.round((1 - e - c) * 1e4) / 1e4);
+  const payload = { respondent_id: state.rid, device_hash: await deviceHashPromise, plot, efficiency: e, community: c, safety: s };
+  if (DEMO) { await new Promise(r => setTimeout(r, 450)); return { ok: true, demo: true }; }
+  const res = await fetch(ENDPOINT, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
+  return res.json();
+}
+
+/* ---------- progress ---------- */
+const answered = { present: !!state.present, future: !!state.future };
+function updateCount() {
+  document.getElementById("p1").classList.toggle("on", answered.present);
+  document.getElementById("p2").classList.toggle("on", answered.future);
+  if (answered.present && answered.future) showShift();
+}
+
+/* ---------- one interactive triangle ---------- */
+function makeTernary(host) {
+  const plot = host.dataset.plot;
+  const card = document.getElementById("card-" + plot);
+  const btn = card.querySelector(".btn"), fine = card.querySelector(".fine");
+  const svg = el("svg", { viewBox: "-30 0 460 398", role: "application", tabindex: 0, "aria-label": `${plot === "present" ? "2026" : "2060"} triangle. Click, drag or use arrow keys to place your dot.` });
+  host.appendChild(svg);
+  triangleBase(svg, plot === "future" ? "#f8ecd8" : "#e9eeee", true);
+
+  const hint = el("text", { x: 200, y: 245, fill: "#7c8582", "font-family": "'DM Sans',sans-serif", "font-size": 14, "text-anchor": "middle" }, svg);
+  hint.textContent = "Tap inside to place your dot";
+  const guides = el("g", { "stroke-width": 1.6, "stroke-dasharray": "3 4", opacity: 0 }, svg);
+  const gE = el("line", { stroke: COL.e }, guides), gC = el("line", { stroke: COL.c }, guides), gS = el("line", { stroke: COL.s }, guides);
+  const ring = el("circle", { r: 15, fill: "none", stroke: "#1d2726", "stroke-width": 1, opacity: 0 }, svg);
+  const dot = el("circle", { r: 8, fill: "#1d2726", stroke: "#fbf8f2", "stroke-width": 2.5, opacity: 0 }, svg);
+
+  let v = null, locked = false, dragging = false;
+
+  function render() {
+    if (!v) return;
+    const P = toXY(v);
+    [dot, ring].forEach(n => { n.setAttribute("cx", P.x); n.setAttribute("cy", P.y); n.setAttribute("opacity", 1); });
+    hint.setAttribute("opacity", 0);
+    guides.setAttribute("opacity", 1);
+    // feet of the perpendiculars: dropping one value to 0 shares it equally between the other two
+    const fE = toXY({ e: 0, c: v.c + v.e / 2, s: v.s + v.e / 2 });
+    const fC = toXY({ e: v.e + v.c / 2, c: 0, s: v.s + v.c / 2 });
+    const fS = toXY({ e: v.e + v.s / 2, c: v.c + v.s / 2, s: 0 });
+    [[gE, fE], [gC, fC], [gS, fS]].forEach(([l, f]) => { l.setAttribute("x1", P.x); l.setAttribute("y1", P.y); l.setAttribute("x2", f.x); l.setAttribute("y2", f.y); });
+    const q = pct(v);
+    for (const k of ["e", "c", "s"]) {
+      card.querySelector(`b[data-k="${k}"]`).textContent = q[k] + "%";
+      card.querySelector(`span[data-m="${k}"]`).style.width = q[k] + "%";
+    }
+    if (!locked) { btn.disabled = false; btn.className = "btn ready"; btn.textContent = "Submit answer"; }
+  }
+
+  function setFromEvent(evt) {
+    const pt = svg.createSVGPoint(); pt.x = evt.clientX; pt.y = evt.clientY;
+    const m = pt.matrixTransform(svg.getScreenCTM().inverse());
+    v = toBary(m.x, m.y); render();
+  }
+
+  function lock(values, msg) {
+    locked = true; v = values; render();
+    btn.disabled = true; btn.className = "btn done"; btn.textContent = "Locked in ✓";
+    card.classList.add("locked");
+    dot.setAttribute("fill", "#4f7f5c"); ring.setAttribute("stroke", "#4f7f5c");
+    fine.className = "fine"; fine.textContent = msg || "Answer recorded. Thank you.";
+    svg.setAttribute("tabindex", -1);
+  }
+
+  svg.addEventListener("pointerdown", e => { if (locked) return; dragging = true; svg.setPointerCapture(e.pointerId); setFromEvent(e); });
+  svg.addEventListener("pointermove", e => { if (dragging && !locked) setFromEvent(e); });
+  svg.addEventListener("pointerup", () => { dragging = false; });
+  svg.addEventListener("pointercancel", () => { dragging = false; });
+  svg.addEventListener("keydown", e => {
+    if (locked) return;
+    const d = { ArrowUp: [0, -5], ArrowDown: [0, 5], ArrowLeft: [-5, 0], ArrowRight: [5, 0] }[e.key];
+    if (!d) return;
+    e.preventDefault();
+    if (!v) v = { e: 1 / 3, c: 1 / 3, s: 1 / 3 };
+    const P = toXY(v); v = toBary(P.x + d[0], P.y + d[1]); render();
+  });
+
+  btn.addEventListener("click", async () => {
+    if (locked || !v) return;
+    btn.disabled = true; btn.className = "btn"; btn.textContent = "Saving…";
+    fine.className = "fine"; fine.textContent = "";
+    try {
+      const r = await submit(plot, v);
+      if (r && (r.ok || r.error === "duplicate")) {
+        state[plot] = v; saveState(state); answered[plot] = true;
+        lock(v, r.ok ? (r.demo ? "Demo mode: shown as locked but not saved." : "Answer recorded. Thank you.") : "We already have an answer for this triangle from this device.");
+        updateCount();
+        if (plot === "present" && !answered.future)
+          document.querySelector(".jump").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+      } else {
+        throw new Error((r && r.error) || "unknown");
+      }
+    } catch (err) {
+      btn.disabled = false; btn.className = "btn ready"; btn.textContent = "Try again";
+      fine.className = "fine err"; fine.textContent = "Couldn't save your answer. Check your connection and try again.";
+    }
+  });
+
+  if (state[plot]) lock(state[plot], "You've already answered this one. Thank you.");
+}
+
+document.querySelectorAll(".tern").forEach(makeTernary);
+
+/* ---------- personal shift summary ---------- */
+function showShift() {
+  const a = state.present, b = state.future;
+  if (!a || !b) return;
+  document.getElementById("shift").style.display = "grid";
+  const host = document.getElementById("shiftPlot");
+  host.innerHTML = "";
+  const svg = el("svg", { viewBox: "-30 0 460 380", width: "100%" }, host);
+  triangleBase(svg);
+  const P = toXY(a), Q = toXY(b);
+  el("defs", {}, svg).innerHTML = '<marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1d2726"/></marker>';
+  if (Math.hypot(Q.x - P.x, Q.y - P.y) > 12) el("line", { x1: P.x, y1: P.y, x2: Q.x, y2: Q.y, stroke: "#1d2726", "stroke-width": 1.8, "stroke-dasharray": "5 4", "marker-end": "url(#ah)" }, svg);
+  el("circle", { cx: P.x, cy: P.y, r: 7, fill: "#7c8582" }, svg);
+  el("circle", { cx: Q.x, cy: Q.y, r: 7, fill: "#1d2726" }, svg);
+
+  const pa = pct(a), pb = pct(b);
+  const names = { e: "efficiency", c: "community", s: "safety" };
+  const diffs = ["e", "c", "s"].map(k => [k, pb[k] - pa[k]]).sort((x, y) => y[1] - x[1]);
+  const up = diffs[0], down = diffs[2];
+  const txt = (up[1] < 3 && down[1] > -3)
+    ? "You expect society's priorities to stay roughly where they are today, even in a world engineered for climate survival."
+    : `You expect society in 2060 to give more priority to <b>${names[up[0]]}</b> (+${up[1]} points) and less to <b>${names[down[0]]}</b> (${down[1]} points) than it does today.`;
+  document.getElementById("shiftText").innerHTML = txt;
+}
+
+/* ---------- init ---------- */
+if (DEMO) document.getElementById("demoBanner").style.display = "block";
+updateCount();
+</script>
+</body>
+</html>
