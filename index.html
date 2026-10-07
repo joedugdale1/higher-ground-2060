@@ -56,7 +56,7 @@ body{
 .stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:var(--paper)}
 #scene{position:absolute;inset:0;width:100%;height:100%;display:block}
 .cap{
-  position:absolute;top:calc(56px + 6vh);left:max(24px,6vw);
+  position:absolute;top:calc(56px + 4vh);left:max(24px,6vw);
   width:min(560px,calc(100% - 120px));
   opacity:0;pointer-events:none;will-change:opacity,transform;
   text-shadow:0 0 14px rgba(243,237,226,.95),0 0 4px rgba(243,237,226,.9);
@@ -64,10 +64,10 @@ body{
 .cap .caps{color:var(--com);margin-bottom:12px}
 .cap h1{font-family:Manrope,system-ui,sans-serif;font-weight:400;font-size:clamp(44px,6.6vw,92px);line-height:.98;letter-spacing:-.01em}
 .cap h1 em{color:var(--saf)}
-.cap .lede{margin-top:18px;font-size:clamp(15px,1.6vw,18px);color:var(--ink-2);max-width:470px}
+.cap .lede{margin-top:min(18px,2vh);font-size:clamp(14px,min(1.6vw,2.6vh),18px);color:var(--ink-2);max-width:470px}
 .cap .lede b{font-weight:600}
 .cap .lede .e{color:var(--eff)} .cap .lede .c{color:var(--com)} .cap .lede .s{color:var(--saf)}
-.cap .hint{margin-top:22px;font-size:13px;color:var(--ink-3)}
+.cap .hint{margin-top:min(22px,2.4vh);font-size:13px;color:var(--ink-3)}
 .cap .by{font-family:Manrope,system-ui,sans-serif;font-size:clamp(26px,3.2vw,40px);line-height:1.12}
 .cap .by b{font-weight:400;color:var(--com)}
 .cap .more{margin-top:10px;color:var(--ink-2);font-size:15px;max-width:460px}
@@ -179,11 +179,11 @@ h2{font-family:Manrope,system-ui,sans-serif;font-weight:400;font-size:clamp(36px
 
 /* ===== Display type: bold sans ===== */
 .brand{font-weight:800;font-size:18px;letter-spacing:-.01em}
-.cap h1{font-weight:800;font-size:clamp(44px,7vw,96px);line-height:.98;letter-spacing:-.035em}
+.cap h1{font-weight:800;font-size:clamp(36px,min(7vw,10vh),96px);line-height:.98;letter-spacing:-.035em}
 .cap h1 .e{color:var(--eff)} .cap h1 .c{color:var(--com)} .cap h1 .s{color:var(--saf)}
-.cap .by{font-weight:700;font-size:clamp(24px,3vw,38px);line-height:1.15;letter-spacing:-.02em}
+.cap .by{font-weight:700;font-size:clamp(20px,min(3vw,4.6vh),38px);line-height:1.15;letter-spacing:-.02em}
 .cap .by b{font-weight:800}
-.dial .year{font-weight:800;font-size:clamp(60px,11vw,150px);letter-spacing:-.05em}
+.dial .year{font-weight:800;font-size:clamp(48px,min(11vw,15vh),150px);letter-spacing:-.05em}
 .num{font-weight:800;font-size:48px;letter-spacing:-.03em}
 h2{font-weight:800;font-size:clamp(32px,4.2vw,52px);letter-spacing:-.03em;line-height:1.05}
 .timeline .yr{font-weight:800;font-size:38px;letter-spacing:-.03em}
@@ -276,7 +276,7 @@ footer{max-width:1080px;margin:60px auto 0;padding:24px 24px 60px;border-top:1px
       <span class="tick" style="bottom:11.8%">2030</span>
       <span class="mark" id="gMark" style="bottom:0"></span>
     </div>
-    <div class="dial" aria-hidden="true">
+    <div class="dial" aria-hidden="true" style="opacity:0">
       <div class="phase caps" id="phase">Repair</div>
       <div class="year" id="bigYear">2026</div>
     </div>
@@ -461,6 +461,7 @@ const journey = document.getElementById("journey");
 const caps = [...document.querySelectorAll(".cap")];
 const gFill = document.getElementById("gFill"), gMark = document.getElementById("gMark");
 const bigYear = document.getElementById("bigYear"), phaseEl = document.getElementById("phase");
+const dialEl = document.querySelector(".dial");
 
 // terrain profile as [x fraction, y fraction]
 const PROFILE = [[0, .95], [.08, .93], [.12, .84], [.15, .72], [.58, .72], [.62, .785], [.80, .785], [.85, .68], [.90, .6], [1, .59]];
@@ -740,6 +741,7 @@ function draw(t) {
   gFill.style.height = (p * 100).toFixed(2) + "%";
   gMark.style.bottom = (p * 100).toFixed(2) + "%";
   bigYear.textContent = Math.round(2026 + 34 * p);
+  dialEl.style.opacity = ss(0.06, 0.12, p).toFixed(3);
   phaseEl.textContent = p < 0.42 ? "Repair" : p < 0.74 ? "Redesign" : "Engineered for survival";
 }
 
